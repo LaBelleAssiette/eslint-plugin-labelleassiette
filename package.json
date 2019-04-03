@@ -1,0 +1,20 @@
+{
+  "name": "@labelleassiette/eslint-plugin-labelleassiette",
+  "version": "0.1.0",
+  "description": "Opinionated eslint rules we use at La Belle Assiette",
+  "main": "index.js",
+  "repository": "git@github.com:LaBelleAssiette/eslint-plugin-labelleassiette.git",
+  "author": "Antoine Bolvy <antoine@labelleassiette.com>",
+  "license": "MIT",
+  "peerDependencies": {
+    "eslint": ">=4",
+    "lodash": ">=3"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "jest": "^24.7.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.11"
+  }
+}
