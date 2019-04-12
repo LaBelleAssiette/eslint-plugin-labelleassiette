@@ -38,6 +38,12 @@ ruleTester.run('mongoose-exec', rule, {
     {
       code: '_.find()',
     },
+    {
+      code: 'Model.populate();',
+    },
+    {
+      code: 'Model.create();',
+    }
   ],
   invalid: [
     {
@@ -49,6 +55,13 @@ ruleTester.run('mongoose-exec', rule, {
     },
     {
       code: 'Model.create().exec()',
+      errors: [{
+        message: ERROR_MSG_EXEC_NOT_NEEDED,
+        type: 'CallExpression',
+      }]
+    },
+    {
+      code: 'Model.populate().exec()',
       errors: [{
         message: ERROR_MSG_EXEC_NOT_NEEDED,
         type: 'CallExpression',

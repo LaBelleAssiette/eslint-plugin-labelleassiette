@@ -120,11 +120,11 @@ module.exports = {
           'findOneAndUpdate',
           'geoNear',
           'geoSearch',
-          'populate',
           'remove',
         ];
 
         const mongooseNoExecFns = [
+          'populate',
           'create',
         ];
 
