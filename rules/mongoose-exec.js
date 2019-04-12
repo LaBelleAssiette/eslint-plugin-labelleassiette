@@ -109,7 +109,6 @@ module.exports = {
         const mongooseFns = [
           'update',
           'count',
-          'create',
           'distinct',
           'find',
           'findById',
