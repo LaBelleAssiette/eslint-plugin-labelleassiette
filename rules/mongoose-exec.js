@@ -36,6 +36,29 @@ function isCallback(node) {
   return isCB;
 }
 
+function isQueryAssign(node) {
+  if (!node || !node.parent) {
+    return false;
+  }
+
+  if (node.parent.type !== 'VariableDeclarator') {
+    return false;
+  }
+
+  const queryVarNames = ['query', 'find'];
+  const nodeName = node.parent.id.name;
+
+  if (queryVarNames.includes(nodeName)) {
+    return true;
+  }
+
+  // Check for camel case, i.e. variables ending with Query or Find
+  return queryVarNames.some(varName => {
+    const camelCase = varName[0].toUpperCase() + varName.slice(1);
+    return nodeName.endsWith(varName) || nodeName.endsWith(camelCase);
+  })
+}
+
 
 module.exports = {
   meta: {
@@ -106,7 +129,7 @@ module.exports = {
           if (isCallback(node.arguments[node.arguments.length - 1])) {
             return;
           }
-          if (!isChainBreaker(getEndOfChain(node))) {
+          if (!isChainBreaker(getEndOfChain(node)) && !isQueryAssign(node)) {
             context.report({
               node,
               messageId: 'expected',

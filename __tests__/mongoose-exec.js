@@ -29,6 +29,12 @@ ruleTester.run('mongoose-exec', rule, {
       code: 'Model.find({}, function() {});',
     },
     {
+      code: 'var query = Model.find({});',
+    },
+    {
+      code: 'var countQuery = Model.count({});',
+    },
+    {
       code: '_.find()',
     },
   ],
