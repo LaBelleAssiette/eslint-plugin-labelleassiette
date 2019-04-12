@@ -87,6 +87,7 @@ module.exports = {
     }],
     messages: {
       expected: 'Expected exec.',
+      not_needed: 'This function does not have an exec, just use the promise returned.'
     },
   },
 
@@ -123,6 +124,10 @@ module.exports = {
           'remove',
         ];
 
+        const mongooseNoExecFns = [
+          'create',
+        ];
+
         if (mongooseFns.includes(getMethodName(node))) {
           // If the method has a callback it means we don't have to expect exec
           if (isCallback(node.arguments[node.arguments.length - 1])) {
@@ -132,6 +137,13 @@ module.exports = {
             context.report({
               node,
               messageId: 'expected',
+            });
+          }
+        } else if (mongooseNoExecFns.includes(getMethodName(node))) {
+          if (isChainBreaker(getEndOfChain(node))) {
+            context.report({
+              node,
+              messageId: 'not_needed',
             });
           }
         }
