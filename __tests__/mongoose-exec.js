@@ -1,8 +1,10 @@
 const rule = require('../rules/mongoose-exec');
 const RuleTester = require('eslint').RuleTester;
 
-const ERROR_MSG_NOT_STYLED = 'Expected exec.';
+const ERROR_MSG_NO_EXEC = 'Expected exec or cursor.';
+const ERROR_MSG_NO_CURSOR = 'Expected cursor.';
 const ERROR_MSG_EXEC_NOT_NEEDED = 'This function does not have an exec, just use the promise returned.';
+const ERROR_MSG_CURSOR_NOT_NEEDED = 'This function does not have a cursor, only find() can have one.';
 
 const ruleTester = new RuleTester();
 
@@ -10,6 +12,9 @@ ruleTester.run('mongoose-exec', rule, {
   valid: [
     {
       code: 'Model.update().exec();',
+    },
+    {
+      code: 'Model.find().cursor();',
     },
     {
       code: 'Model.update().lean().exec();',
@@ -36,6 +41,12 @@ ruleTester.run('mongoose-exec', rule, {
       code: 'var countQuery = Model.count({});',
     },
     {
+      code: 'var cursor = Model.find({}).cursor();',
+    },
+    {
+      code: 'var someCursor = Model.find({}).cursor();',
+    },
+    {
       code: '_.find()',
     },
     {
@@ -49,7 +60,7 @@ ruleTester.run('mongoose-exec', rule, {
     {
       code: 'Model.update()',
       errors: [{
-        message: ERROR_MSG_NOT_STYLED,
+        message: ERROR_MSG_NO_EXEC,
         type: 'CallExpression',
       }],
     },
@@ -66,6 +77,20 @@ ruleTester.run('mongoose-exec', rule, {
         message: ERROR_MSG_EXEC_NOT_NEEDED,
         type: 'CallExpression',
       }]
-    }
+    },
+    {
+      code: 'var cursor = Model.find();',
+      errors: [{
+        message: ERROR_MSG_NO_CURSOR,
+        type: 'CallExpression',
+      }]
+    },
+    {
+      code: 'var cursor = Model.update().cursor();',
+      errors: [{
+        message: ERROR_MSG_CURSOR_NOT_NEEDED,
+        type: 'CallExpression',
+      }]
+    },
   ],
 });

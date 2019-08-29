@@ -5,8 +5,16 @@ const _ = require('lodash');
 const getMethodName = _.property(['callee', 'property', 'name']);
 const getCaller = _.property(['callee', 'object']);
 
-function isChainBreaker(node) {
+function isExec(node) {
   return getMethodName(node) === 'exec';
+}
+
+function isCursor(node) {
+  return getMethodName(node) === 'cursor';
+}
+
+function isChainBreaker(node) {
+  return isExec(node) || isCursor(node);
 }
 
 function getEndOfChain(node) {
@@ -36,7 +44,7 @@ function isCallback(node) {
   return isCB;
 }
 
-function isQueryAssign(node) {
+function isAssign(node, assignVarNames) {
   if (!node || !node.parent) {
     return false;
   }
@@ -45,20 +53,18 @@ function isQueryAssign(node) {
     return false;
   }
 
-  const queryVarNames = ['query', 'find'];
   const nodeName = node.parent.id.name;
 
-  if (queryVarNames.includes(nodeName)) {
+  if (assignVarNames.includes(nodeName)) {
     return true;
   }
 
-  // Check for camel case, i.e. variables ending with Query or Find
-  return queryVarNames.some(varName => {
+  // Check for camel case, e.g. variables ending with Query or Find
+  return assignVarNames.some(varName => {
     const camelCase = varName[0].toUpperCase() + varName.slice(1);
     return nodeName.endsWith(varName) || nodeName.endsWith(camelCase);
   })
 }
-
 
 module.exports = {
   meta: {
@@ -86,8 +92,10 @@ module.exports = {
       additionalProperties: false,
     }],
     messages: {
-      expected: 'Expected exec.',
-      not_needed: 'This function does not have an exec, just use the promise returned.'
+      expected: 'Expected exec or cursor.',
+      expected_cursor: 'Expected cursor.',
+      not_needed: 'This function does not have an exec, just use the promise returned.',
+      not_needed_cursor: 'This function does not have a cursor, only find() can have one.',
     },
   },
 
@@ -128,19 +136,44 @@ module.exports = {
           'create',
         ];
 
+        const mongooseCursorFns = [
+          'find',
+        ];
+
+        const endOfChain = getEndOfChain(node);
+
         if (mongooseFns.includes(getMethodName(node))) {
           // If the method has a callback it means we don't have to expect exec
           if (isCallback(node.arguments[node.arguments.length - 1])) {
             return;
           }
-          if (!isChainBreaker(getEndOfChain(node)) && !isQueryAssign(node)) {
+
+          if (isCursor(endOfChain) && !mongooseCursorFns.includes(getMethodName(node))) {
+            context.report({
+              node,
+              messageId: 'not_needed_cursor',
+            });
+          }
+
+          if (isAssign(node, ['cursor'])) {
+            if (!isCursor(endOfChain)) {
+              context.report({
+                node,
+                messageId: 'expected_cursor',
+              });
+            }
+            return;
+          }
+
+          if (!isAssign(node, ['find', 'query']) && !isChainBreaker(endOfChain)) {
             context.report({
               node,
               messageId: 'expected',
             });
+            return;
           }
         } else if (mongooseNoExecFns.includes(getMethodName(node))) {
-          if (isChainBreaker(getEndOfChain(node))) {
+          if (isExec(endOfChain)) {
             context.report({
               node,
               messageId: 'not_needed',
