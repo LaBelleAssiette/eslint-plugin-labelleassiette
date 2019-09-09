@@ -1,10 +1,10 @@
 const rule = require('../rules/mongoose-exec');
 const RuleTester = require('eslint').RuleTester;
 
-const ERROR_MSG_NO_EXEC = 'Expected exec or cursor.';
-const ERROR_MSG_NO_CURSOR = 'Expected cursor.';
+const ERROR_MSG_NO_EXEC = 'Expected exec or cursor or stream.';
+const ERROR_MSG_NO_CURSOR = 'Expected cursor or stream.';
 const ERROR_MSG_EXEC_NOT_NEEDED = 'This function does not have an exec, just use the promise returned.';
-const ERROR_MSG_CURSOR_NOT_NEEDED = 'This function does not have a cursor, only find() can have one.';
+const ERROR_MSG_CURSOR_NOT_NEEDED = 'This function does not have a cursor/stream, only find() can have one.';
 
 const ruleTester = new RuleTester();
 
@@ -45,6 +45,12 @@ ruleTester.run('mongoose-exec', rule, {
     },
     {
       code: 'var someCursor = Model.find({}).cursor();',
+    },
+    {
+      code: 'var stream = Model.find({}).stream();',
+    },
+    {
+      code: 'var someStream = Model.find({}).stream();',
     },
     {
       code: '_.find()',

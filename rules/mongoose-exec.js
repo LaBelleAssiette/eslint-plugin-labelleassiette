@@ -10,7 +10,7 @@ function isExec(node) {
 }
 
 function isCursor(node) {
-  return getMethodName(node) === 'cursor';
+  return getMethodName(node) === 'cursor' || getMethodName(node) === 'stream';
 }
 
 function isChainBreaker(node) {
@@ -92,10 +92,10 @@ module.exports = {
       additionalProperties: false,
     }],
     messages: {
-      expected: 'Expected exec or cursor.',
-      expected_cursor: 'Expected cursor.',
+      expected: 'Expected exec or cursor or stream.',
+      expected_cursor: 'Expected cursor or stream.',
       not_needed: 'This function does not have an exec, just use the promise returned.',
-      not_needed_cursor: 'This function does not have a cursor, only find() can have one.',
+      not_needed_cursor: 'This function does not have a cursor/stream, only find() can have one.',
     },
   },
 
@@ -155,7 +155,7 @@ module.exports = {
             });
           }
 
-          if (isAssign(node, ['cursor'])) {
+          if (isAssign(node, ['cursor', 'stream'])) {
             if (!isCursor(endOfChain)) {
               context.report({
                 node,
