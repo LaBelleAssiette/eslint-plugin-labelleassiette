@@ -49,11 +49,19 @@ function isAssign(node, assignVarNames) {
     return false;
   }
 
-  if (node.parent.type !== 'VariableDeclarator') {
+  let nodeName;
+
+  if (node.parent.type === 'VariableDeclarator') {
+    nodeName = node.parent.id.name;
+  } else if (
+    node.parent.type === 'AssignmentExpression' &&
+    node.parent.operator === '='
+  ) {
+    nodeName = node.parent.left.name;
+  } else {
     return false;
   }
 
-  const nodeName = node.parent.id.name;
 
   if (assignVarNames.includes(nodeName)) {
     return true;

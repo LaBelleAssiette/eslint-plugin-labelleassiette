@@ -41,6 +41,9 @@ ruleTester.run('mongoose-exec', rule, {
       code: 'var countQuery = Model.count({});',
     },
     {
+      code: 'mockedQuery = User.find();',
+    },
+    {
       code: 'var cursor = Model.find({}).cursor();',
     },
     {
