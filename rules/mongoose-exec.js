@@ -125,7 +125,10 @@ module.exports = {
 
         const mongooseFns = [
           'update',
+          'updateOne',
+          'updateMany',
           'count',
+          'countDocuments',
           'distinct',
           'find',
           'findById',
@@ -137,6 +140,8 @@ module.exports = {
           'geoNear',
           'geoSearch',
           'remove',
+          'deleteOne',
+          'deleteMany',
         ];
 
         const mongooseNoExecFns = [
