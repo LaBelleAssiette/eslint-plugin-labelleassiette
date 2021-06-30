@@ -55,7 +55,8 @@ function isAssign(node, assignVarNames) {
     nodeName = node.parent.id.name;
   } else if (
     node.parent.type === 'AssignmentExpression' &&
-    node.parent.operator === '='
+    node.parent.operator === '=' &&
+    node.parent.left.name
   ) {
     nodeName = node.parent.left.name;
   } else {
